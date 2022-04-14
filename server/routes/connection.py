@@ -1,22 +1,10 @@
-import os
-import psycopg2
 import bcrypt
-
-
-dbpassword = os.environ.get("PASSWORD")
+from db_connection import get_connection
 
 
 def getUsersConnection():
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
-
+    connection = get_connection()
     cursor = connection.cursor()
     cursor.execute("SELECT username, id, signedIn FROM users")
     columns = cursor.description
@@ -29,14 +17,7 @@ def getUsersConnection():
 
 def createUserConnection(username, password):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     hashedPassword = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     stringedHashedPassword = hashedPassword.decode()
@@ -51,14 +32,7 @@ def createUserConnection(username, password):
 
 def getSingleUserConnection(id):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
     cursor = connection.cursor()
     cursor.execute(f"SELECT username,id FROM users WHERE Id={id}")
     columns = cursor.description
@@ -70,14 +44,7 @@ def getSingleUserConnection(id):
 
 
 def getMessagesConnection():
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     formattedTime = "Formatted_Time"
     formattedDate = "Formatted_Date"
@@ -95,14 +62,7 @@ def getMessagesConnection():
 
 
 def getSingleMessageConnection(messageId):
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
     cursor = connection.cursor()
     cursor.execute(f"SELECT * FROM messages WHERE messageid={messageId}")
     columns = cursor.description
@@ -114,14 +74,7 @@ def getSingleMessageConnection(messageId):
 
 
 def createMessageConnection(userId, text, topic):
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     cursor = connection.cursor()
     cursor.execute(
@@ -134,14 +87,7 @@ def createMessageConnection(userId, text, topic):
 
 def getMessagesByTopicConnection(topic):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     formattedDate = "Formatted_Date"
 
@@ -159,14 +105,7 @@ def getMessagesByTopicConnection(topic):
 
 def checkUserConnection(username):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
     cursor = connection.cursor()
     cursor.execute(f"SELECT username, password FROM users WHERE username='{username}'")
     columns = cursor.description
@@ -179,14 +118,7 @@ def checkUserConnection(username):
 
 def getActiveUsersConnection():
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     cursor = connection.cursor()
     cursor.execute(f"SELECT username from users where signedin='Yes'")
@@ -200,14 +132,7 @@ def getActiveUsersConnection():
 
 def activateUserConnection(username):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     cursor = connection.cursor()
     cursor.execute(f"update users set signedin='Yes' where username='{username}'")
@@ -218,14 +143,7 @@ def activateUserConnection(username):
 
 def deactivateUserConnection(username):
 
-    connection = psycopg2.connect(
-        host="ec2-52-71-69-66.compute-1.amazonaws.com",
-        port="5432",
-        database="dfohmf7phrnrjp",
-        user="tpemykhqhjpokb",
-        password=dbpassword,
-        sslmode="require",
-    )
+    connection = get_connection()
 
     cursor = connection.cursor()
     cursor.execute(f"update users set signedin='No' where username='{username}'")

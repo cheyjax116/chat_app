@@ -2,9 +2,8 @@ from distutils.log import debug
 from socket import SocketIO, socket
 from flask import send_from_directory
 import socketio
-
-# from __init__ import create_app
-from . import create_app, get_jwt 
+from __init__ import create_app
+# from . import create_app, get_jwt 
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
 import os

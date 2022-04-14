@@ -1,7 +1,7 @@
 import json
 from flask import request, Blueprint, jsonify
 from flask_restx import Api, Resource
-from server import create_app, get_socket
+# from server import create_app, get_socket
 from server.data import *
 from flask_jwt_extended import create_access_token, unset_jwt_cookies, jwt_required, get_jwt_identity
 import bcrypt
@@ -12,9 +12,9 @@ from flask_socketio import SocketIO, emit
 
 api_blueprint = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_blueprint)
-app = create_app()
+# app = create_app()
 
-socketio = get_socket()
+# socketio = get_socket()
 
 
 
