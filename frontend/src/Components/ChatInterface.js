@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useToken from "./useToken";
 import useUser from "./useUser";
-import io from "socket.io-client"
+import io from "socket.io-client";
 
 const ChatInterface = () => {
   window.setTimeout(function () {
@@ -14,8 +14,7 @@ const ChatInterface = () => {
   });
 
   // const socket = io()
-  // const socket = io.connect("http://localhost:5000")
-
+ 
 
   const [topic, setTopic] = useState("General");
 
@@ -50,39 +49,20 @@ const ChatInterface = () => {
   async function getMessages() {
     await axios.get(`api/messages/${topic}`).then((res) => {
       setMessages(res.data);
-      
     });
+  }
 
-    };
-
-    // console.log(messages)
-
-  
-  // const getmoreMessages = () => {
-    
-  //   socket.on("message", msg => {
-  //     setMessages([...messages, msg]);
-  //     console.log(messages)
-  //   });
-
-  // }
-
-  
   async function getUsers() {
     await axios.get("api/users").then((res) => {
       setUsers(res.data);
     });
   }
 
-
-
   async function getActiveUsers() {
     await axios.get("api/activeusers").then((res) => {
       setActiveUsers(res.data);
     });
   }
-
-  
 
   const actives = activeUsers?.map((user) => {
     return (
@@ -115,14 +95,12 @@ const ChatInterface = () => {
   const databaseSend = () => {
     let messageBox = document.getElementById("messageBox");
     let newText = message.replaceAll("'", "''");
-  
 
     // if (message !== '') {
     //   socket.emit("message", message);
     //   setMessage("");
 
-    // } 
-  
+    // }
 
     const data = {
       userId: userId,
@@ -138,11 +116,12 @@ const ChatInterface = () => {
         },
       })
       .then((res) => {
+        console.log(res)
         return res;
       })
       .then((res) => {
         // getMessages();
-        getActiveUsers()
+        getActiveUsers();
         messageBox.value = "";
       })
       .catch((error) => {
@@ -190,27 +169,27 @@ const ChatInterface = () => {
 
   useEffect(() => {
     getMessages();
-
-    
-    // socket.on('new_message', (msg) => {
-    //   // setMessages((messages) => [...messages, msg])
-    //   console.log(msg)
-    // } )
-    
-
-
     getUsers();
     getActiveUsers();
   }, [topic]);
+
+
+  useEffect(() => {
+     const socket = io.connect()
+      socket.on("connect", () => {
+        console.log(socket.id)
+      })
+      socket.on('new_message', (msg) => {
+      // setMessages((messages) => [...messages, msg])
+      console.log(msg)
+    } )
+
+  },[])
 
   const formatTime = (utcTime) => {
     const time = new Date(utcTime);
     return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
-
-
-
-
 
   const theMessages =
     data &&
@@ -374,14 +353,13 @@ const ChatInterface = () => {
                   //   getMessages();
                   // }}
                   onChange={(e) => {
-                    setMessage(e.target.value)
+                    setMessage(e.target.value);
                   }}
                   value={message}
                   placeholder="Type Your Message"
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
                       databaseSend();
-
                     }
                   }}
                 />
@@ -395,8 +373,8 @@ const ChatInterface = () => {
               //   if (message !== '') {
               //     socket.emit("message", message);
               //     setMessage("");
-        
-              //   } 
+
+              //   }
               // }}
             >
               SEND

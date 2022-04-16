@@ -1,1 +1,1 @@
-web: gunicorn --chdir server main:app
+web: gunicorn --chdir server main:app -w 1 -k eventlet

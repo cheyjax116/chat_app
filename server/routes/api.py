@@ -1,26 +1,25 @@
 import json
 from flask import request, Blueprint, jsonify
 from flask_restx import Api, Resource
-# from server import create_app, get_socket
+import server.socket_connect
 from server.data import *
-from flask_jwt_extended import create_access_token, unset_jwt_cookies, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token,
+    unset_jwt_cookies,
+    jwt_required,
+    get_jwt_identity,
+)
 import bcrypt
-from flask_socketio import SocketIO, emit
-
-
 
 
 api_blueprint = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_blueprint)
-# create_app()
 
-# socketio = get_socket()
-
+the_socket = server.socket_connect.emit_socket
 
 
 @api.route("/messages")
 class Message(Resource):
-    
     def get(self):
 
         return jsonify(getMessages())
@@ -32,8 +31,8 @@ class Message(Resource):
         topic = req_data["topic"]
 
         message = jsonify(createMessage(userId, text, topic))
-        #broadcast message
-        # socketio.emit('new_message', message)
+        # broadcast message
+        the_socket(message)
         return message
 
 
@@ -41,9 +40,8 @@ class Message(Resource):
 class GetAllUsers(Resource):
     # @jwt_required()
     def get(self):
-    
-        return jsonify(getUsers())
 
+        return jsonify(getUsers())
 
     def post(self):
         req_data = request.get_json()
@@ -68,7 +66,6 @@ class GetMessagesByTopic(Resource):
 
 @api.route("/token", methods=["POST"])
 class CreateToken(Resource):
-   
     def post(self):
 
         req_data = request.get_json()
@@ -79,7 +76,7 @@ class CreateToken(Resource):
             if i["username"] == username and bcrypt.checkpw(
                 password.encode(), i["password"].encode()
             ):
-                
+
                 access_token = create_access_token(identity=username)
                 response = {"access_token": access_token}
                 return response
@@ -98,8 +95,9 @@ class Logout(Resource):
 @api.route("/activeusers")
 class activeUsers(Resource):
     def get(self):
-        
+
         return jsonify(getActiveUsers())
+
 
 @api.route("/activateuser", methods=["POST"])
 class activeUsers(Resource):
@@ -107,9 +105,8 @@ class activeUsers(Resource):
 
         req_data = request.get_json()
         username = req_data["username"]
-        
+
         return jsonify(activateUser(username))
-      
 
 
 @api.route("/deactivateuser", methods=["POST"])
@@ -118,7 +115,5 @@ class activeUsers(Resource):
 
         req_data = request.get_json()
         username = req_data["username"]
-        
+
         return jsonify(deactiveUser(username))
-
-

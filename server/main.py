@@ -1,8 +1,12 @@
 from distutils.log import debug
-from socket import SocketIO, socket
+
+# from socket import socket
+# from socket import SocketIO, socket
 from flask import send_from_directory
-import socketio
-from __init__ import create_app
+
+# import socketio
+from __init__ import create_app, get_jwt_instance
+
 # from . import create_app, get_jwt_instance
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
@@ -14,23 +18,13 @@ from flask_jwt_extended import (
     create_access_token,
 )
 import json
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, emit
 
 
 app = create_app()
-# jwt = get_jwt_instance()
-
-# socketio = SocketIO(app, cors_allowed_origins="*")
-
-# socketio.emit("new_message", {"text":"Hello"})
 
 
-# @socketio.on("message")
-# def handleMessage(msg):
-#     print("Message: " + msg)
-#     send(msg, broadcast=True)
-#     return None
-
+socketio_socket = SocketIO(app, cors_allowed_origins="*")
 
 # @socketio.on("connect")
 # def handleConnect():
@@ -63,5 +57,5 @@ def serve(path):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    # socketio.run(app, debug=True)
+    # app.run(debug=True)
+    socketio_socket.run(app, debug=True)
