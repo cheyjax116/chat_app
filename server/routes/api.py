@@ -12,7 +12,7 @@ from flask_socketio import SocketIO, emit
 
 api_blueprint = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_blueprint)
-# app = create_app()
+# create_app()
 
 # socketio = get_socket()
 
@@ -33,7 +33,7 @@ class Message(Resource):
 
         message = jsonify(createMessage(userId, text, topic))
         #broadcast message
-        socketio.emit('new_message', message)
+        # socketio.emit('new_message', message)
         return message
 
 

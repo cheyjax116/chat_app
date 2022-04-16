@@ -23,7 +23,8 @@ def createUserConnection(username, password):
     stringedHashedPassword = hashedPassword.decode()
     cursor = connection.cursor()
     cursor.execute(
-        f"INSERT INTO users (username, password) VALUES ('{username}', '{stringedHashedPassword}')"
+        "INSERT INTO users (username, password) VALUES (%s, %s)",
+        (username, stringedHashedPassword,)
     )
     connection.commit()
     cursor.close()
@@ -34,7 +35,7 @@ def getSingleUserConnection(id):
 
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(f"SELECT username,id FROM users WHERE Id={id}")
+    cursor.execute("SELECT username,id FROM users WHERE Id=%s", (id))
     columns = cursor.description
     records = [
         {columns[index][0]: column for index, column in enumerate(value)}
@@ -46,12 +47,14 @@ def getSingleUserConnection(id):
 def getMessagesConnection():
     connection = get_connection()
 
-    formattedTime = "Formatted_Time"
-    formattedDate = "Formatted_Date"
+    # formattedTime = "formatted_time"
+    # formattedDate = "formatted_date"
 
     cursor = connection.cursor()
     cursor.execute(
-        f"SELECT *, to_char (time_created, 'HH:MI PM') AS {formattedTime}, to_char (createddate, 'MM/DD/YY') AS {formattedDate} FROM messages ORDER BY {formattedDate} ASC"
+        """SELECT *, to_char (time_created, 'HH:MI PM') AS "formatted_time", 
+        to_char (createddate, 'MM/DD/YY') AS "formatted_date" FROM messages ORDER BY "formatted_date" ASC""",
+        # (formattedTime, formattedDate, formattedDate,)
     )
     columns = cursor.description
     records = [
@@ -64,7 +67,7 @@ def getMessagesConnection():
 def getSingleMessageConnection(messageId):
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(f"SELECT * FROM messages WHERE messageid={messageId}")
+    cursor.execute("SELECT * FROM messages WHERE messageid=%s", (messageId))
     columns = cursor.description
     records = [
         {columns[index][0]: column for index, column in enumerate(value)}
@@ -78,7 +81,8 @@ def createMessageConnection(userId, text, topic):
 
     cursor = connection.cursor()
     cursor.execute(
-        f"INSERT INTO messages (userid, text, topic) VALUES ('{userId}', '{text}', '{topic}')"
+        "INSERT INTO messages (userid, text, topic) VALUES (%s, %s, %s)",
+        (userId, text, topic)
     )
     connection.commit()
     cursor.close()
@@ -89,11 +93,12 @@ def getMessagesByTopicConnection(topic):
 
     connection = get_connection()
 
-    formattedDate = "Formatted_Date"
+    # formattedDate = "formatted_date"
 
     cursor = connection.cursor()
     cursor.execute(
-        f"SELECT *, to_char (createddate, 'Day, Month fmDDth, YYYY') AS {formattedDate} FROM messages WHERE topic='{topic}' ORDER BY messageid ASC"
+        """SELECT *, to_char (createddate, 'Day, Month fmDDth, YYYY') AS "formatted_date" FROM messages WHERE topic=%s ORDER BY messageid ASC""", 
+        (topic,)
     )
     columns = cursor.description
     records = [
@@ -107,7 +112,7 @@ def checkUserConnection(username):
 
     connection = get_connection()
     cursor = connection.cursor()
-    cursor.execute(f"SELECT username, password FROM users WHERE username='{username}'")
+    cursor.execute("SELECT username, password FROM users WHERE username=%s", (username,))
     columns = cursor.description
     records = [
         {columns[index][0]: column for index, column in enumerate(value)}
@@ -121,7 +126,7 @@ def getActiveUsersConnection():
     connection = get_connection()
 
     cursor = connection.cursor()
-    cursor.execute(f"SELECT username from users where signedin='Yes'")
+    cursor.execute("SELECT username from users where signedin='Yes'")
     columns = cursor.description
     records = [
         {columns[index][0]: column for index, column in enumerate(value)}
@@ -135,7 +140,7 @@ def activateUserConnection(username):
     connection = get_connection()
 
     cursor = connection.cursor()
-    cursor.execute(f"update users set signedin='Yes' where username='{username}'")
+    cursor.execute("update users set signedin='Yes' where username=%s", (username,))
     connection.commit()
     cursor.close()
     connection.close()
@@ -146,7 +151,9 @@ def deactivateUserConnection(username):
     connection = get_connection()
 
     cursor = connection.cursor()
-    cursor.execute(f"update users set signedin='No' where username='{username}'")
+    cursor.execute("update users set signedin='No' where username=%s", (username,))
     connection.commit()
     cursor.close()
     connection.close()
+
+

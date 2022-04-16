@@ -3,7 +3,7 @@ from socket import SocketIO, socket
 from flask import send_from_directory
 import socketio
 from __init__ import create_app
-# from . import create_app, get_jwt 
+# from . import create_app, get_jwt_instance
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
 import os
@@ -18,7 +18,7 @@ from flask_socketio import SocketIO, send
 
 
 app = create_app()
-jwt = get_jwt()
+# jwt = get_jwt_instance()
 
 # socketio = SocketIO(app, cors_allowed_origins="*")
 

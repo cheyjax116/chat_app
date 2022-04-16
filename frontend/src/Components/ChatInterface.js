@@ -14,7 +14,7 @@ const ChatInterface = () => {
   });
 
   // const socket = io()
-  const socket = io.connect("http://localhost:5000")
+  // const socket = io.connect("http://localhost:5000")
 
 
   const [topic, setTopic] = useState("General");
@@ -122,7 +122,7 @@ const ChatInterface = () => {
     //   setMessage("");
 
     // } 
-    
+  
 
     const data = {
       userId: userId,
@@ -142,7 +142,7 @@ const ChatInterface = () => {
       })
       .then((res) => {
         // getMessages();
-        // getActiveUsers()
+        getActiveUsers()
         messageBox.value = "";
       })
       .catch((error) => {
@@ -192,10 +192,10 @@ const ChatInterface = () => {
     getMessages();
 
     
-    socket.on('new_message', (msg) => {
-      // setMessages((messages) => [...messages, msg])
-      console.log(msg)
-    } )
+    // socket.on('new_message', (msg) => {
+    //   // setMessages((messages) => [...messages, msg])
+    //   console.log(msg)
+    // } )
     
 
 
