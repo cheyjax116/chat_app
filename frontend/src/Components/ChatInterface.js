@@ -12,8 +12,6 @@ const ChatInterface = () => {
     let element = document.getElementById("chatBox");
     element.scrollTop = element.scrollHeight;
   });
-
-  // const socket = io()
  
 
   const [topic, setTopic] = useState("General");
@@ -116,7 +114,6 @@ const ChatInterface = () => {
         },
       })
       .then((res) => {
-        console.log(res)
         return res;
       })
       .then((res) => {
@@ -179,9 +176,9 @@ const ChatInterface = () => {
       socket.on("connect", () => {
         console.log(socket.id)
       })
-      socket.on('new_message', (msg) => {
+      socket.on("new_message", (message) => {
       // setMessages((messages) => [...messages, msg])
-      console.log(msg)
+      console.log(message)
     } )
 
   },[])

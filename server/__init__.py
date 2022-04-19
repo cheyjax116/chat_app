@@ -9,11 +9,11 @@ from datetime import date, datetime, timedelta
 import os
 
 from flask_socketio import SocketIO, emit
+from importlib import reload
 
 app = Flask(__name__, static_folder="../frontend/build")
-# from server.routes.api import api_blueprint
-import server.routes.api
-app.register_blueprint(server.routes.api.api_blueprint)
+from server.routes.api import api_blueprint
+app.register_blueprint(api_blueprint)
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.host = "localhost"

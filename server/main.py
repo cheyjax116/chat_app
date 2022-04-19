@@ -1,12 +1,8 @@
 from distutils.log import debug
-
-# from socket import socket
-# from socket import SocketIO, socket
 from flask import send_from_directory
-
-# import socketio
-from __init__ import create_app, get_jwt_instance
-
+# from __init__ import create_app, get_jwt_instance
+import server.__init__
+import socket_connect
 # from . import create_app, get_jwt_instance
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
@@ -20,8 +16,9 @@ from flask_jwt_extended import (
 import json
 from flask_socketio import SocketIO, send, emit
 
-
-app = create_app()
+init = server.__init__
+app = init.create_app()
+# app = create_app()
 
 
 socketio_socket = SocketIO(app, cors_allowed_origins="*")

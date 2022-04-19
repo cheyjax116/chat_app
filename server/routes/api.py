@@ -2,6 +2,8 @@ import json
 from flask import request, Blueprint, jsonify
 from flask_restx import Api, Resource
 import server.socket_connect
+
+# import server.main
 from server.data import *
 from flask_jwt_extended import (
     create_access_token,
@@ -15,7 +17,11 @@ import bcrypt
 api_blueprint = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_blueprint)
 
-the_socket = server.socket_connect.emit_socket
+the_socket = server.socket_connect.emit_socket()
+
+# def emit_socket(message):
+#     print(message)
+#     return server.main.socketio_socket.emit("new_message", message)
 
 
 @api.route("/messages")
@@ -30,10 +36,10 @@ class Message(Resource):
         text = req_data["text"]
         topic = req_data["topic"]
 
-        message = jsonify(createMessage(userId, text, topic))
+        message = createMessage(userId, text, topic)
         # broadcast message
-        the_socket(message)
-        return message
+        the_socket.emit("new_message", message)
+        return jsonify(message)
 
 
 @api.route("/users")
