@@ -1,5 +1,5 @@
 import bcrypt
-from db_connection import get_connection
+from server.db_connection import get_connection
 
 
 def getUsersConnection():

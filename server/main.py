@@ -1,12 +1,12 @@
 from distutils.log import debug
+import imp
 from flask import send_from_directory
 # from __init__ import create_app, get_jwt_instance
-import server.__init__
-import socket_connect
 # from . import create_app, get_jwt_instance
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
 import os
+from flask import request, jsonify
 from flask_jwt_extended import (
     JWTManager,
     get_jwt,
@@ -15,17 +15,40 @@ from flask_jwt_extended import (
 )
 import json
 from flask_socketio import SocketIO, send, emit
+import socketio
+from server.data import *
 
-init = server.__init__
-app = init.create_app()
-# app = create_app()
+from server import create_app, socketio_socket
+app = create_app()
 
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-socketio_socket = SocketIO(app, cors_allowed_origins="*")
+@socketio.on("connect")
+def test_connect():
+    print("connected")
 
-# @socketio.on("connect")
-# def handleConnect():
-#     print("connected now")
+@socketio.on("new_message")
+# def get():
+#     return jsonify(getMessages())
+
+def post(msg):
+    
+    userId = msg['userId']
+    text = msg['text']
+    topic = msg['topic']
+
+    message = createMessage(userId, text, topic)
+    # broadcast message
+    socketio.emit("new_message", msg)
+    print(userId, text, topic)
+    return jsonify(message)
+
+# @socketio.on("new_message")
+# def get(msg):
+#     print(msg)
+    # send(msg, broadcast=True)
+    # return None
+
 
 
 @app.after_request

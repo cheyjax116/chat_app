@@ -94,36 +94,41 @@ const ChatInterface = () => {
     let messageBox = document.getElementById("messageBox");
     let newText = message.replaceAll("'", "''");
 
-    // if (message !== '') {
-    //   socket.emit("message", message);
-    //   setMessage("");
+    if (message !== '') {
+      socket.emit("new_message", {userId: userId, text:message, topic: topic});
+      console.log(message)
+      setMessage("");
+      messageBox.value = "";
 
-    // }
+    }
 
-    const data = {
-      userId: userId,
-      text: newText,
-      topic: topic,
-    };
+    
 
-    axios
-      .post("/api/messages", data, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        return res;
-      })
-      .then((res) => {
-        // getMessages();
-        getActiveUsers();
-        messageBox.value = "";
-      })
-      .catch((error) => {
-        console.log("There was an error!", error);
-      });
+    // const data = {
+    //   userId: userId,
+    //   text: newText,
+    //   topic: topic,
+    // };
+
+    // axios
+    //   .post("/api/messages", data, {
+    //     headers: {
+    //       Accept: "application/json",
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then((res) => {
+        
+    //     return res;
+    //   })
+    //   .then((res) => {
+    //     // getMessages();
+    //     getActiveUsers();
+    //     messageBox.value = "";
+    //   })
+    //   .catch((error) => {
+    //     console.log("There was an error!", error);
+    //   });
   };
 
   const logOut = () => {
@@ -171,13 +176,15 @@ const ChatInterface = () => {
   }, [topic]);
 
 
+  const socket = io.connect()
+
   useEffect(() => {
-     const socket = io.connect()
       socket.on("connect", () => {
         console.log(socket.id)
       })
       socket.on("new_message", (message) => {
-      // setMessages((messages) => [...messages, msg])
+      setMessages((messages) => [...messages, message])
+      getMessages()
       console.log(message)
     } )
 
