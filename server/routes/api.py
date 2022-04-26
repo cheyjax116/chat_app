@@ -1,3 +1,4 @@
+from datetime import date, datetime
 import json
 from socket import socket
 from flask import request, Blueprint, jsonify
@@ -19,10 +20,6 @@ api = Api(api_blueprint)
 from server import socketio_socket
 
 
-# def emit_socket(message):
-#     print(message)
-#     return server.main.socketio_socket.emit("new_message", message)
-
 
 # @api.route("/messages")
 # class Message(Resource):
@@ -42,26 +39,38 @@ from server import socketio_socket
 #         return jsonify(message)
 
 
-# @socketio_socket.on("connect")
-# def test_connect():
-#     print("connected")
+@socketio_socket.on("connect")
+def test_connect():
+    print("connected")
 
-# @socketio_socket.on("new_message")
+@socketio_socket.on("new_message")
 # def get():
-
 #     return jsonify(getMessages())
-# def post():
-#     req_data = request.get_json()
-#     userId = req_data["userId"]
-#     text = req_data["text"]
-#     topic = req_data["topic"]
 
-#     message = createMessage(userId, text, topic)
-#     # broadcast message
-#     emit("new_message", message)
-#     print(message)
-#     return jsonify(message)
+def post(msg):
+    
+    userId = msg['userId']
+    text = msg['text']
+    topic = msg['topic']
 
+    message = createMessage(userId, text, topic)
+    # broadcast message
+    theMessage = jsonify(message)
+    socketio_socket.emit("new_message", msg)
+    print(msg)
+    print(json.dumps(message))
+    return jsonify(message)
+
+@socketio_socket.on("get_messages_by_topic")
+def get_topic(topic):
+    messages = getMessagesByTopic(topic)
+    # print(topic)
+    # print((messages))
+    def myconverter(o):
+        if isinstance(o, date):
+            return o.__str__()
+    socketio_socket.emit("get_messages_by_topic", json.dumps(messages, default=myconverter))
+    return jsonify(messages)
 
 @api.route("/users")
 class GetAllUsers(Resource):
@@ -91,9 +100,6 @@ class GetMessagesByTopic(Resource):
         return jsonify(getMessagesByTopic(topic))
 
 
-@socketio_socket.on("get_message_by_topic")
-def get(topic):
-        return jsonify(getMessagesByTopic(topic))
 
 
 @api.route("/token", methods=["POST"])

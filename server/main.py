@@ -21,35 +21,6 @@ from server.data import *
 from server import create_app, socketio_socket
 app = create_app()
 
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-@socketio.on("connect")
-def test_connect():
-    print("connected")
-
-@socketio.on("new_message")
-# def get():
-#     return jsonify(getMessages())
-
-def post(msg):
-    
-    userId = msg['userId']
-    text = msg['text']
-    topic = msg['topic']
-
-    message = createMessage(userId, text, topic)
-    # broadcast message
-    socketio.emit("new_message", msg)
-    print(userId, text, topic)
-    return jsonify(message)
-
-# @socketio.on("new_message")
-# def get(msg):
-#     print(msg)
-    # send(msg, broadcast=True)
-    # return None
-
-
 
 @app.after_request
 def refresh_expiring_jwts(response):
@@ -77,5 +48,4 @@ def serve(path):
 
 
 if __name__ == "__main__":
-    # app.run(debug=True)
     socketio_socket.run(app, debug=True)

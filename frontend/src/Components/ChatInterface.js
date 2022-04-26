@@ -81,10 +81,10 @@ const ChatInterface = () => {
     );
   });
 
-  const data = messages.map((message) => {
+  const data = messages?.map((message) => {
     return {
       ...message,
-      user: getUserInfo(message.userid),
+      user: getUserInfo(message?.userid),
     };
   });
 
@@ -95,11 +95,12 @@ const ChatInterface = () => {
     let newText = message.replaceAll("'", "''");
 
     if (message !== '') {
-      socket.emit("new_message", {userId: userId, text:message, topic: topic});
+      socket.emit("new_message", {userId: userId, text:newText, topic: topic});
       console.log(message)
+      
       setMessage("");
       messageBox.value = "";
-
+      
     }
 
     
@@ -178,18 +179,27 @@ const ChatInterface = () => {
 
   const socket = io.connect()
 
+
   useEffect(() => {
       socket.on("connect", () => {
         console.log(socket.id)
       })
       socket.on("new_message", (message) => {
-      setMessages((messages) => [...messages, message])
+        // setMessages((messages) => [...messages, message])
       getMessages()
       console.log(message)
+
+
     } )
 
+      socket.on("get_messages_by_topic", (messages) => {
+        console.log(messages)
+      })
+    
   },[])
+  
 
+  
   const formatTime = (utcTime) => {
     const time = new Date(utcTime);
     return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -373,13 +383,7 @@ const ChatInterface = () => {
               type="submit"
               className="btn sendBtn"
               onClick={databaseSend}
-              // onClick={() => {
-              //   if (message !== '') {
-              //     socket.emit("message", message);
-              //     setMessage("");
-
-              //   }
-              // }}
+        
             >
               SEND
             </Button>

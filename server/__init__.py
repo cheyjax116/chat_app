@@ -21,13 +21,11 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     app.host = "localhost"
-    socketio_socket.init_app
+    socketio_socket.init_app(app)
 
     return app
 
-@socketio_socket.on("connect")
-def test_connect():
-    print("connected")
+
 
 # socketio = SocketIO(app, cors_allowed_origins="*")
 
