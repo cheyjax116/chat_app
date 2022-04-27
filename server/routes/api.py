@@ -136,22 +136,44 @@ class activeUsers(Resource):
 
         return jsonify(getActiveUsers())
 
+@socketio_socket.on("activateUser")
+def activate(user):
 
-@api.route("/activateuser", methods=["POST"])
-class activeUsers(Resource):
-    def post(self):
+    # req_data = request.get_json()
+    username = user['username']
+    activatedUsers = activateUser(username)
+    socketio_socket.emit("activateUser", username)
 
-        req_data = request.get_json()
-        username = req_data["username"]
-
-        return jsonify(activateUser(username))
+    return jsonify(activatedUsers)
 
 
-@api.route("/deactivateuser", methods=["POST"])
-class activeUsers(Resource):
-    def post(self):
 
-        req_data = request.get_json()
-        username = req_data["username"]
+# @api.route("/activateuser", methods=["POST"])
+# class activeUsers(Resource):
+#     def post(self):
 
-        return jsonify(deactiveUser(username))
+#         req_data = request.get_json()
+#         username = req_data["username"]
+
+#         return jsonify(activateUser(username))
+
+
+# @api.route("/deactivateuser", methods=["POST"])
+# class activeUsers(Resource):
+#     def post(self):
+
+#         req_data = request.get_json()
+#         username = req_data["username"]
+
+#         return jsonify(deactiveUser(username))
+
+@socketio_socket.on("deactivateUser")
+def deactivate(user):
+
+    # req_data = request.get_json()
+    username = user['username']
+    deactivatedUser = deactiveUser(username)
+    socketio_socket.emit("deactivateUser", username)
+    print("user is deactivated")
+
+    return jsonify(deactivatedUser)

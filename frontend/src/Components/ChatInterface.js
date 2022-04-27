@@ -12,7 +12,6 @@ const ChatInterface = () => {
     let element = document.getElementById("chatBox");
     element.scrollTop = element.scrollHeight;
   });
- 
 
   const [topic, setTopic] = useState("General");
 
@@ -92,18 +91,19 @@ const ChatInterface = () => {
 
   const databaseSend = () => {
     let messageBox = document.getElementById("messageBox");
-    let newText = message.replaceAll("'", "''");
 
-    if (message !== '') {
-      socket.emit("new_message", {userId: userId, text:newText, topic: topic});
-      console.log(message)
-      
+
+    if (message !== "") {
+      socket.emit("new_message", {
+        userId: userId,
+        text: message,
+        topic: topic,
+      });
+      // console.log(message);
+
       setMessage("");
       messageBox.value = "";
-      
     }
-
-    
 
     // const data = {
     //   userId: userId,
@@ -119,7 +119,7 @@ const ChatInterface = () => {
     //     },
     //   })
     //   .then((res) => {
-        
+
     //     return res;
     //   })
     //   .then((res) => {
@@ -142,6 +142,7 @@ const ChatInterface = () => {
       })
       .then((res) => {
         removeToken();
+        socket.emit("deactivateUser", {username: signedInUser})
         signOutUser();
         navigate("/");
         window.location.reload();
@@ -150,24 +151,28 @@ const ChatInterface = () => {
         console.log("An error was caught!", error);
       });
 
-    const user = {
-      username: signedInUser,
-    };
+    // const user = {
+    //   username: signedInUser,
+    // };
 
-    axios
-      .post("api/deactivateuser", user, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        return res;
-      })
-      .catch((error) => {
-        console.log("There was an error!", error);
-      });
+    
+    // axios
+    //   .post("api/deactivateuser", user, {
+    //     headers: {
+    //       Accept: "application/json",
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then((res) => {
+    //     console.log(res);
+    //     return res;
+    //   })
+    //   .catch((error) => {
+    //     console.log("There was an error!", error);
+    //   });
+
+
+
   };
 
   useEffect(() => {
@@ -176,30 +181,35 @@ const ChatInterface = () => {
     getActiveUsers();
   }, [topic]);
 
-
-  const socket = io.connect()
+  const socket = io.connect();
+  // socket.emit("activateUser", signedInUser)
 
 
   useEffect(() => {
-      socket.on("connect", () => {
-        console.log(socket.id)
-      })
-      socket.on("new_message", (message) => {
-        // setMessages((messages) => [...messages, message])
-      getMessages()
-      console.log(message)
+    socket.on("connect", () => {
+      // console.log(socket.id);
 
+    });
+    socket.on("new_message", (message) => {
+      setMessages((messages) => [...messages, message])
+      // getMessages();
+      console.log(message);
+    });
 
-    } )
+    // socket.on("get_messages_by_topic", (messages) => {
+    //   console.log(messages);
+    // });
 
-      socket.on("get_messages_by_topic", (messages) => {
-        console.log(messages)
-      })
-    
-  },[])
-  
+    socket.on("activateUser", () => {
+      getActiveUsers()
+    });
 
-  
+    socket.on("deactivateUser", () => {
+      getActiveUsers()
+    });
+
+  }, []);
+
   const formatTime = (utcTime) => {
     const time = new Date(utcTime);
     return time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -237,7 +247,7 @@ const ChatInterface = () => {
               className="card-header d-flex justify-content-between p-3"
               style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.3" }}
             >
-              <p className="fw-bold mb-0">{message?.user?.username}</p>
+              <p className="fw-bold mb-0 paddingRight">{message?.user?.username}</p>
               <p className=" small mb-0">
                 <i>{formatTime(message?.time_created)}</i>
               </p>
@@ -252,14 +262,7 @@ const ChatInterface = () => {
 
   return (
     <>
-      <div
-        id="container"
-        // onFocus={() => {
-        //   getActiveUsers();
-        //   getMessages();
-        // }}
-        // onClick={getActiveUsers}
-      >
+      <div id="container">
         <div className="text-center mx-auto" id="navbar">
           {topic}
         </div>
@@ -358,14 +361,6 @@ const ChatInterface = () => {
                   className="form-control messageBox"
                   rows="2"
                   cols="500"
-                  // onFocus={() => {
-                  //   getActiveUsers();
-                  //   getMessages();
-                  // }}
-                  // onChange={() => {
-                  //   getActiveUsers();
-                  //   getMessages();
-                  // }}
                   onChange={(e) => {
                     setMessage(e.target.value);
                   }}
@@ -383,7 +378,6 @@ const ChatInterface = () => {
               type="submit"
               className="btn sendBtn"
               onClick={databaseSend}
-        
             >
               SEND
             </Button>

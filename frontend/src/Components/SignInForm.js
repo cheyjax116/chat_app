@@ -1,7 +1,7 @@
 import React from "react";
 import "./SignInForm.css";
 import { Button } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import chatIcon from "../img/chat-app-icon.png";
 import userIcon from "../img/userIcon.png";
@@ -9,6 +9,7 @@ import pwdIcon from "../img/passwordIcon.png";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import io from "socket.io-client";
 
 const SignInForm = () => {
   const [username, setUsername] = useState("");
@@ -21,6 +22,16 @@ const SignInForm = () => {
   const togglePasswordVisibility = () => {
     setPasswordShown(!passwordShown);
   };
+
+  const socket = io.connect();
+
+  // useEffect(() => {
+    
+  //   socket.on("activateUser", (username) => {
+  //   });
+  // }, []);
+
+
 
   const handleClick = () => {
     const data = {
@@ -42,6 +53,7 @@ const SignInForm = () => {
       .then((res) => {
         localStorage.setItem("token", res.data.access_token);
         localStorage.setItem("user", username);
+        socket.emit("activateUser", {username: username})
         navigate("/chat");
         window.location.reload();
       })
@@ -50,20 +62,24 @@ const SignInForm = () => {
         setWrongDetails(true);
       });
 
-    axios
-      .post("api/activateuser", data, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        return res;
-      })
-      .catch((error) => {
-        console.log("There was an error!", error);
-      });
+    // axios
+    //   .post("api/activateuser", data, {
+    //     headers: {
+    //       Accept: "application/json",
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then((res) => {
+    //     console.log(res);
+    //     return res;
+    //   })
+    //   .catch((error) => {
+    //     console.log("There was an error!", error);
+    //   });
+
+     
+
+
   };
 
   return (
