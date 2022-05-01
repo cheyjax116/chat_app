@@ -75,6 +75,17 @@ def getSingleMessageConnection(messageId):
     ]
     return records
 
+def getLatestMessageConnection():
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM messages order by messageid desc limit 1")
+    columns = cursor.description
+    records = [
+        {columns[index][0]: column for index, column in enumerate(value)}
+        for value in cursor.fetchall()
+    ]
+    return records
+
 
 def createMessageConnection(userId, text, topic):
     connection = get_connection()
@@ -93,11 +104,12 @@ def getMessagesByTopicConnection(topic):
 
     connection = get_connection()
 
-    # formattedDate = "formatted_date"
+  
 
     cursor = connection.cursor()
     cursor.execute(
-        """SELECT *, to_char (createddate, 'Day, Month fmDDth, YYYY') AS "formatted_date" FROM messages WHERE topic=%s ORDER BY messageid ASC""", 
+        # """SELECT *, to_char (createddate, 'Day, Month fmDDth, YYYY') AS "formatted_date" FROM messages WHERE topic=%s ORDER BY messageid ASC""", 
+        """SELECT * FROM messages WHERE topic=%s ORDER BY messageid ASC""", 
         (topic,)
     )
     columns = cursor.description
@@ -105,6 +117,7 @@ def getMessagesByTopicConnection(topic):
         {columns[index][0]: column for index, column in enumerate(value)}
         for value in cursor.fetchall()
     ]
+
     return records
 
 

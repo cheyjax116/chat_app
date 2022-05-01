@@ -20,7 +20,6 @@ api = Api(api_blueprint)
 from server import socketio_socket
 
 
-
 # @api.route("/messages")
 # class Message(Resource):
 #     def get(self):
@@ -43,34 +42,54 @@ from server import socketio_socket
 def test_connect():
     print("connected")
 
+
 @socketio_socket.on("new_message")
 # def get():
 #     return jsonify(getMessages())
 
+
 def post(msg):
-    
-    userId = msg['userId']
-    text = msg['text']
-    topic = msg['topic']
+
+    userId = msg["userId"]
+    text = msg["text"]
+    topic = msg["topic"]
 
     message = createMessage(userId, text, topic)
+
+    getNewMessage = getLatestMessage()
+
     # broadcast message
-    theMessage = jsonify(message)
-    socketio_socket.emit("new_message", msg)
-    print(msg)
-    print(json.dumps(message))
+    def datetime_handler(x):
+        if isinstance(x, (date, datetime)):
+            return x.isoformat()
+        raise TypeError("Unknown type")
+
+    print(json.loads(json.dumps(getNewMessage, default=datetime_handler)))
+    socketio_socket.emit(
+        "new_message", json.loads(json.dumps(getNewMessage, default=datetime_handler))
+    )
+    # print(msg)
+    # print(json.dumps(message))
     return jsonify(message)
+
 
 @socketio_socket.on("get_messages_by_topic")
 def get_topic(topic):
     messages = getMessagesByTopic(topic)
-    # print(topic)
-    # print((messages))
-    def myconverter(o):
-        if isinstance(o, date):
-            return o.__str__()
-    socketio_socket.emit("get_messages_by_topic", json.dumps(messages, default=myconverter))
+
+    def datetime_handler(x):
+        if isinstance(x, (date, datetime)):
+            return x.isoformat()
+        raise TypeError("Unknown type")
+
+    # print(messages)
+
+    socketio_socket.emit(
+        "get_messages_by_topic",
+        json.loads(json.dumps(messages, default=datetime_handler)),
+    )
     return jsonify(messages)
+
 
 @api.route("/users")
 class GetAllUsers(Resource):
@@ -97,9 +116,16 @@ class GetSingleUser(Resource):
 @api.route("/messages/<topic>")
 class GetMessagesByTopic(Resource):
     def get(self, topic):
-        return jsonify(getMessagesByTopic(topic))
+        messages = getMessagesByTopic(topic)
 
+        def datetime_handler(x):
+            if isinstance(x, (date, datetime)):
+                return x.isoformat()
+            raise TypeError("Unknown type")
 
+        dateAdjust = json.loads(json.dumps(messages, default=datetime_handler))
+
+        return jsonify(dateAdjust)
 
 
 @api.route("/token", methods=["POST"])
@@ -136,16 +162,16 @@ class activeUsers(Resource):
 
         return jsonify(getActiveUsers())
 
+
 @socketio_socket.on("activateUser")
 def activate(user):
 
     # req_data = request.get_json()
-    username = user['username']
+    username = user["username"]
     activatedUsers = activateUser(username)
     socketio_socket.emit("activateUser", username)
 
     return jsonify(activatedUsers)
-
 
 
 # @api.route("/activateuser", methods=["POST"])
@@ -167,11 +193,12 @@ def activate(user):
 
 #         return jsonify(deactiveUser(username))
 
+
 @socketio_socket.on("deactivateUser")
 def deactivate(user):
 
     # req_data = request.get_json()
-    username = user['username']
+    username = user["username"]
     deactivatedUser = deactiveUser(username)
     socketio_socket.emit("deactivateUser", username)
     print("user is deactivated")
