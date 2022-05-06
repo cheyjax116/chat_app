@@ -25,13 +25,6 @@ const SignInForm = () => {
 
   const socket = io.connect();
 
-  // useEffect(() => {
-    
-  //   socket.on("activateUser", (username) => {
-  //   });
-  // }, []);
-
-
 
   const handleClick = () => {
     const data = {
@@ -61,25 +54,6 @@ const SignInForm = () => {
         console.log("There was an error!", error);
         setWrongDetails(true);
       });
-
-    // axios
-    //   .post("api/activateuser", data, {
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     return res;
-    //   })
-    //   .catch((error) => {
-    //     console.log("There was an error!", error);
-    //   });
-
-     
-
-
   };
 
   return (

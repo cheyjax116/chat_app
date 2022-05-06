@@ -6,7 +6,7 @@ import axios from "axios";
 import useToken from "./useToken";
 import useUser from "./useUser";
 import io from "socket.io-client";
-import  { DateTime } from "luxon";
+import { DateTime } from "luxon";
 
 const ChatInterface = () => {
   window.setTimeout(function () {
@@ -28,6 +28,10 @@ const ChatInterface = () => {
 
   const [message, setMessage] = useState("");
 
+  const [newMessage, setNewMessage] = useState("")
+
+  const [clearMessage, setClearMessage] = useState(false)
+
   let navigate = useNavigate();
 
   const getUserInfo = (user_id) => {
@@ -47,7 +51,6 @@ const ChatInterface = () => {
   async function getMessages() {
     await axios.get(`api/messages/${topic}`).then((res) => {
       setMessages(res.data);
-      
     });
   }
 
@@ -91,9 +94,6 @@ const ChatInterface = () => {
 
   let userId = selectSignedInUser(signedInUser);
 
-
-  // let currentTime = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
-
   function dateSuffix(day) {
     if (day % 10 === 1) return `${day}st`;
     if (day % 10 === 2) return `${day}nd`;
@@ -101,64 +101,31 @@ const ChatInterface = () => {
     return `${day}th`;
   }
 
-const convertDate = (date) => {
-  // let converted = new Date(date).toLocaleDateString('en-us', { weekday: "long", year:"numeric", month: "long", day: "numeric"})
- 
-  const weekday = DateTime.fromISO(date).toFormat('EEEE')
-  const year = DateTime.fromISO(date).toFormat('yyyy')
-  const day = dateSuffix(DateTime.fromISO(date).toFormat('d'));
-  const month = DateTime.fromISO(date).toFormat('MMMM')
-  
+  const convertDate = (date) => {
+    const weekday = DateTime.fromISO(date).toFormat("EEEE");
+    const year = DateTime.fromISO(date).toFormat("yyyy");
+    const day = dateSuffix(DateTime.fromISO(date).toFormat("d"));
+    const month = DateTime.fromISO(date).toFormat("MMMM");
 
-  return `${weekday}, ${month} ${day}, ${year}`
-}
-
-
+    return `${weekday}, ${month} ${day}, ${year}`;
+  };
 
   const databaseSend = () => {
     let messageBox = document.getElementById("messageBox");
-    
+
     if (message !== "") {
       socket.emit("new_message", {
         userId: userId,
-        // user: signedInUser,
         text: message,
         topic: topic,
-        // currentTime: currentTime
       });
-      // console.log(message);
-
-      // socket.emit("get_messages_by_topic", topic)
-      setMessage("");
-      messageBox.value = "";
+      
     }
+    setMessage("");
+    messageBox.value = "";
 
-    // const data = {
-    //   userId: userId,
-    //   text: newText,
-    //   topic: topic,
-    // };
-
-    // axios
-    //   .post("/api/messages", data, {
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json",
-    //     },
-    //   })
-    //   .then((res) => {
-
-    //     return res;
-    //   })
-    //   .then((res) => {
-    //     // getMessages();
-    //     getActiveUsers();
-    //     messageBox.value = "";
-    //   })
-    //   .catch((error) => {
-    //     console.log("There was an error!", error);
-    //   });
   };
+  
 
   const logOut = () => {
     axios
@@ -170,7 +137,7 @@ const convertDate = (date) => {
       })
       .then((res) => {
         removeToken();
-        socket.emit("deactivateUser", {username: signedInUser})
+        socket.emit("deactivateUser", { username: signedInUser });
         signOutUser();
         navigate("/");
         window.location.reload();
@@ -183,7 +150,6 @@ const convertDate = (date) => {
     //   username: signedInUser,
     // };
 
-    
     // axios
     //   .post("api/deactivateuser", user, {
     //     headers: {
@@ -198,64 +164,100 @@ const convertDate = (date) => {
     //   .catch((error) => {
     //     console.log("There was an error!", error);
     //   });
-
-
-
   };
 
   useEffect(() => {
     getMessages();
-    // socket.emit("get_messages_by_topic", topic)
     getUsers();
     getActiveUsers();
+    // console.log(topic)
   }, [topic]);
-  
+
   const socket = io.connect();
 
-  // console.log(topic)
-  // socket.emit("activateUser", signedInUser)
+  useEffect(() => {
+    if (newMessage === topic ) {
 
+      setNewMessage("")
+      // setClearMessage(true)
+      
+    } 
+    // checkClearedMessage()
+    
+    console.log(newMessage)
+    // console.log(clearMessage)
 
+  }, [newMessage])
+
+  // useEffect(() => {
+  //   checkClearedMessage()
+  //   console.log(clearMessage)
+    
+  // }, [clearMessage])
+
+  // const checkClearedMessage = () => {
+  //   if (clearMessage === true + newMessage) {
+  //     setNewMessage("")
+  //     console.log(clearMessage)
+  //     setClearMessage(false)
+  //     console.log(newMessage)
+  //   }
+  //   console.log(clearMessage)
+  // }
 
   useEffect(() => {
+
+    let newSocket = io.connect()
     socket.on("connect", () => {
-      // console.log(socket.id);
-
+      // console.log("Connected...")
     });
-    socket.on("new_message", (message) => {
-      setMessages((messages) => [...messages, message[0]])
-      console.log(message)
+    newSocket.on("new_message", (message) => {
    
-    });
-    socket.on("get_messages_by_topic", (messages) => {
-      // setMessages((messages) => [...messages, messages])
-        setMessages(messages)
-        // console.log(messages);
-      },[]);
+        setMessages((messages) => [...messages, message[0]]);
+        if (message[0].topic != topic) {
 
+          console.log("topic doesn't match...")
 
+        }
+        setNewMessage(message[0].topic)
+  
+       
+        
+      });
       
 
     socket.on("activateUser", () => {
-      getActiveUsers()
+      getActiveUsers();
     });
 
     socket.on("deactivateUser", () => {
-      getActiveUsers()
+      getActiveUsers();
     });
-
   }, []);
 
+  // const clearNewMessage = () => {
+  //   setNewMessage("")
+  //   console.log(newMessage)
+    
+  // }
+
   const formatTime = (utcTime) => {
-    const time = DateTime.fromISO(utcTime).toFormat('t');  
-    return time
+    const time = DateTime.fromISO(utcTime).toFormat("t");
+    return time;
   };
 
- 
+  const filteredData = data.filter((message) => {
+    if (message.topic === topic) {
+      return message
+
+    }
+  })
+
+
 
   const theMessages =
-    data &&
-    data.map((message, index) => {
+    filteredData &&
+    filteredData.map((message, index) => {
       let prev = data[index - 1];
       let current = data[index];
 
@@ -285,10 +287,10 @@ const convertDate = (date) => {
               className="card-header d-flex justify-content-between p-3"
               style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.3" }}
             >
-              <p className="fw-bold mb-0 paddingRight">{message?.user?.username}</p>
-              {/* <p className="fw-bold mb-0 paddingRight">{!message?.user?.username ? signedInUser : message?.user?.username}</p> */}
+              <p className="fw-bold mb-0 paddingRight">
+                {message?.user?.username}
+              </p>
               <p className=" small mb-0">
-                {/* <i>{!message?.time_created ? currentTime : formatTime(message?.time_created)}</i> */}
                 <i>{formatTime(message?.time_created)}</i>
               </p>
             </div>
@@ -312,75 +314,135 @@ const convertDate = (date) => {
           <p className="text-center">{actives}</p>
 
           <h6 className="text-center p-3">Topics</h6>
+          {/* <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4"> */}
+          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
+          
+         <div>
+
+          
           <Button
             className={
               topic === "General"
-                ? "p-2 d-flex justify-content-center align-items-center mx-auto mb-4 activeButton"
-                : "p-2 d-flex justify-content-center align-items-center mx-auto mb-4"
+                ? "p-2 activeButton"
+                : "p-2"
             }
             autoFocus="True"
             id="General"
             onClick={(e) => {
               setTopic(e.target.id);
+              if ( newMessage === e.target.id) {
+                setNewMessage("")
+               
+              }
+
             }}
           >
             General
           </Button>
+          </div>
+           {/* using this to test what will appear once there is a new message. */}
+          <div>
+          <span className="p-2 m-1 newMessageButton">New</span> 
+
+          </div>
+          
+          { newMessage === "General" && topic != "General" ? <span className="m-1 p-2 newMessageButton">New</span> 
+          : ''}
+          
+          </div>
+          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
           <Button
             className={
               topic === "Art"
-                ? "p-2 d-flex justify-content-center align-items-center mx-auto mb-4 activeButton"
-                : "p-2 d-flex justify-content-center align-items-center mx-auto mb-4"
+                ? "p-2 activeButton"
+                : "p-2"
             }
             id="Art"
             onClick={(e) => {
               setTopic(e.target.id);
+              if ( newMessage === e.target.id) {
+                setNewMessage("")
+                
+              }
+              
             }}
           >
             Art
           </Button>
+          { newMessage === "Art" && topic != "Art" ? <span className="m-1 p-2 newMessageButton">New</span> 
+          : ''}
+         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
+          
+          </div>
+          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
           <Button
             className={
               topic === "Film & TV"
-                ? "p-2 d-flex justify-content-center align-items-center mx-auto mb-4 activeButton"
-                : "p-2 d-flex justify-content-center align-items-center mx-auto mb-4"
+                ? "p-2 activeButton"
+                : "p-2"
             }
             id="Film & TV"
             onClick={(e) => {
               setTopic(e.target.id);
+              if ( newMessage === e.target.id) {
+                setNewMessage("")
+             
+              }
+
             }}
           >
             Film & TV
           </Button>
+          { newMessage === "Film & TV" && topic != "Film & TV" ? <span className="m-1 p-2 newMessageButton">New</span> 
+          : ''}
+          </div>
+          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
           <Button
             className={
               topic === "Music"
-                ? "p-2 d-flex justify-content-center align-items-center mx-auto mb-4 activeButton"
-                : "p-2 d-flex justify-content-center align-items-center mx-auto mb-4"
+                ? "p-2 activeButton"
+                : "p-2"
             }
             id="Music"
             onClick={(e) => {
               setTopic(e.target.id);
+              if ( newMessage === e.target.id) {
+                setNewMessage("")
+                
+              }
             }}
           >
             Music
           </Button>
+          { newMessage === "Music" && topic != "Music" ? <span className="m-1 p-2 newMessageButton">New</span> 
+          : ''}
+         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
+          </div>
+          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
           <Button
             className={
               topic === "Sports"
-                ? "p-2 d-flex justify-content-center align-items-center mx-auto mb-4 activeButton"
-                : "p-2 d-flex justify-content-center align-items-center mx-auto mb-4"
+                ? "p-2 activeButton"
+                : "p-2"
             }
             id="Sports"
             onClick={(e) => {
               setTopic(e.target.id);
+              if ( newMessage === e.target.id) {
+                setNewMessage("")
+              
+              }
             }}
           >
             Sports
           </Button>
+          { newMessage === "Sports" && topic != "Sports" ? <span className="m-1 p-2 newMessageButton">New</span> 
+          : ''}
+         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
+          </div>
 
           <Button
-            className="p-3 d-flex text-center mx-auto logoutBtn"
+            className="p-2 d-flex justify-content-center align-items-center mx-auto mb-4 logoutBtn"
             onClick={logOut}
           >
             Logout
@@ -390,6 +452,7 @@ const convertDate = (date) => {
         <div className="parent">
           <div className="discussionBox" id="chatBox">
             {theMessages}
+        
           </div>
 
           <div className="flex child">
@@ -409,6 +472,7 @@ const convertDate = (date) => {
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
                       databaseSend();
+                    
                     }
                   }}
                 />

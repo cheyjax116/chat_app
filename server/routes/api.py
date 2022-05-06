@@ -33,9 +33,25 @@ from server import socketio_socket
 #         topic = req_data["topic"]
 
 #         message = createMessage(userId, text, topic)
+
+#         def datetime_handler(x):
+#             if isinstance(x, (date, datetime)):
+#                 return x.isoformat()
+#             raise TypeError("Unknown type")
+
+#         getNewMessage = getLatestMessage()
+        
+#         socketio_socket.emit(
+#             "new_message", json.loads(json.dumps(getNewMessage, default=datetime_handler))
+#     )
 #         # broadcast message
-#         emit("new_message", message)
+#         # emit("new_message", message)
 #         return jsonify(message)
+
+
+
+
+
 
 
 @socketio_socket.on("connect")
@@ -44,10 +60,6 @@ def test_connect():
 
 
 @socketio_socket.on("new_message")
-# def get():
-#     return jsonify(getMessages())
-
-
 def post(msg):
 
     userId = msg["userId"]
@@ -64,13 +76,13 @@ def post(msg):
             return x.isoformat()
         raise TypeError("Unknown type")
 
-    print(json.loads(json.dumps(getNewMessage, default=datetime_handler)))
+    
     socketio_socket.emit(
         "new_message", json.loads(json.dumps(getNewMessage, default=datetime_handler))
     )
-    # print(msg)
-    # print(json.dumps(message))
+
     return jsonify(message)
+    # return jsonify(getNewMessage)
 
 
 @socketio_socket.on("get_messages_by_topic")
@@ -81,8 +93,6 @@ def get_topic(topic):
         if isinstance(x, (date, datetime)):
             return x.isoformat()
         raise TypeError("Unknown type")
-
-    # print(messages)
 
     socketio_socket.emit(
         "get_messages_by_topic",
@@ -166,7 +176,6 @@ class activeUsers(Resource):
 @socketio_socket.on("activateUser")
 def activate(user):
 
-    # req_data = request.get_json()
     username = user["username"]
     activatedUsers = activateUser(username)
     socketio_socket.emit("activateUser", username)
@@ -174,30 +183,9 @@ def activate(user):
     return jsonify(activatedUsers)
 
 
-# @api.route("/activateuser", methods=["POST"])
-# class activeUsers(Resource):
-#     def post(self):
-
-#         req_data = request.get_json()
-#         username = req_data["username"]
-
-#         return jsonify(activateUser(username))
-
-
-# @api.route("/deactivateuser", methods=["POST"])
-# class activeUsers(Resource):
-#     def post(self):
-
-#         req_data = request.get_json()
-#         username = req_data["username"]
-
-#         return jsonify(deactiveUser(username))
-
-
 @socketio_socket.on("deactivateUser")
 def deactivate(user):
 
-    # req_data = request.get_json()
     username = user["username"]
     deactivatedUser = deactiveUser(username)
     socketio_socket.emit("deactivateUser", username)

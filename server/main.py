@@ -1,8 +1,6 @@
 from distutils.log import debug
 import imp
 from flask import send_from_directory
-# from __init__ import create_app, get_jwt_instance
-# from . import create_app, get_jwt_instance
 from flask_restx import Api, Resource
 from datetime import date, datetime, timedelta
 import os
@@ -14,8 +12,6 @@ from flask_jwt_extended import (
     create_access_token,
 )
 import json
-from flask_socketio import SocketIO, send, emit
-import socketio
 from server.data import *
 
 from server import create_app, socketio_socket

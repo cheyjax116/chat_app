@@ -25,12 +25,3 @@ def create_app():
 
     return app
 
-
-
-# socketio = SocketIO(app, cors_allowed_origins="*")
-
-# def get_socket():
-#     return socketio
-
-# def get_jwt_instance():
-#     return jwt
