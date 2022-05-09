@@ -82,6 +82,7 @@ p {
   outline: none !important;
   border: none !important;
   width: 100px !important;
+  min-width: 100px !important;
 }
 
 .parent {
@@ -162,7 +163,7 @@ a {
 .newMessageButton {
   background-color: #d1a429 !important;
   border-radius: 50%;
-  font-size: 10px;
+  font-size: 13px;
   /* position:absolute;
   left: 16%;
   margin-top: -20px; */

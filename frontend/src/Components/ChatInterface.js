@@ -7,6 +7,7 @@ import useToken from "./useToken";
 import useUser from "./useUser";
 import io from "socket.io-client";
 import { DateTime } from "luxon";
+import TopicButton  from "./TopicButton"
 
 const ChatInterface = () => {
   window.setTimeout(function () {
@@ -14,7 +15,7 @@ const ChatInterface = () => {
     element.scrollTop = element.scrollHeight;
   });
 
-  const [topic, setTopic] = useState("General");
+  const [currentTopic, setCurrentTopic] = useState("General");
 
   const [messages, setMessages] = useState([]);
 
@@ -28,9 +29,19 @@ const ChatInterface = () => {
 
   const [message, setMessage] = useState("");
 
-  const [newMessage, setNewMessage] = useState("")
+  // const [newMessage, setNewMessage] = useState("")
 
   const [clearMessage, setClearMessage] = useState(false)
+
+const [newMessage, setNewMessage] = useState( {
+          General: false,
+          Art: false,
+          "Film & TV": false,
+          Music: false,
+          Sports: false,
+})
+       
+
 
   let navigate = useNavigate();
 
@@ -49,7 +60,7 @@ const ChatInterface = () => {
   };
 
   async function getMessages() {
-    await axios.get(`api/messages/${topic}`).then((res) => {
+    await axios.get(`api/messages/${currentTopic}`).then((res) => {
       setMessages(res.data);
     });
   }
@@ -117,7 +128,7 @@ const ChatInterface = () => {
       socket.emit("new_message", {
         userId: userId,
         text: message,
-        topic: topic,
+        topic: currentTopic,
       });
       
     }
@@ -170,15 +181,15 @@ const ChatInterface = () => {
     getMessages();
     getUsers();
     getActiveUsers();
-    // console.log(topic)
-  }, [topic]);
+    console.log(currentTopic)
+  }, [currentTopic]);
 
   const socket = io.connect();
 
   useEffect(() => {
-    if (newMessage === topic ) {
-
-      setNewMessage("")
+    if (newMessage === currentTopic ) {
+      console.log(newMessage)
+      // setNewMessage("")
       // setClearMessage(true)
       
     } 
@@ -214,13 +225,20 @@ const ChatInterface = () => {
     newSocket.on("new_message", (message) => {
    
         setMessages((messages) => [...messages, message[0]]);
-        if (message[0].topic != topic) {
+        if (message[0].topic != currentTopic) {
 
           console.log("topic doesn't match...")
+          console.log(currentTopic)
 
         }
-        setNewMessage(message[0].topic)
-  
+        setNewMessage( {
+
+          ...newMessage,
+          [message[0].topic]: true
+        })
+          
+        
+       console.log(message[0])
        
         
       });
@@ -247,7 +265,7 @@ const ChatInterface = () => {
   };
 
   const filteredData = data.filter((message) => {
-    if (message.topic === topic) {
+    if (message.topic === currentTopic) {
       return message
 
     }
@@ -306,7 +324,7 @@ const ChatInterface = () => {
     <>
       <div id="container">
         <div className="text-center mx-auto" id="navbar">
-          {topic}
+          {currentTopic}
         </div>
 
         <div className="userBox col-3 userText">
@@ -314,132 +332,14 @@ const ChatInterface = () => {
           <p className="text-center">{actives}</p>
 
           <h6 className="text-center p-3">Topics</h6>
-          {/* <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4"> */}
-          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
-          
-         <div>
+
+          <TopicButton topicName={"General"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.General} setNewMessage={setNewMessage} />
+          <TopicButton topicName={"Art"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Art} setNewMessage={setNewMessage} />
+          <TopicButton topicName={"Film & TV"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage["Film & TV"]} setNewMessage={setNewMessage} />
+          <TopicButton topicName={"Music"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Music} setNewMessage={setNewMessage} />
+          <TopicButton topicName={"Sports"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Sports} setNewMessage={setNewMessage} />
 
           
-          <Button
-            className={
-              topic === "General"
-                ? "p-2 activeButton"
-                : "p-2"
-            }
-            autoFocus="True"
-            id="General"
-            onClick={(e) => {
-              setTopic(e.target.id);
-              if ( newMessage === e.target.id) {
-                setNewMessage("")
-               
-              }
-
-            }}
-          >
-            General
-          </Button>
-          </div>
-           {/* using this to test what will appear once there is a new message. */}
-          <div>
-          <span className="p-2 m-1 newMessageButton">New</span> 
-
-          </div>
-          
-          { newMessage === "General" && topic != "General" ? <span className="m-1 p-2 newMessageButton">New</span> 
-          : ''}
-          
-          </div>
-          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
-          <Button
-            className={
-              topic === "Art"
-                ? "p-2 activeButton"
-                : "p-2"
-            }
-            id="Art"
-            onClick={(e) => {
-              setTopic(e.target.id);
-              if ( newMessage === e.target.id) {
-                setNewMessage("")
-                
-              }
-              
-            }}
-          >
-            Art
-          </Button>
-          { newMessage === "Art" && topic != "Art" ? <span className="m-1 p-2 newMessageButton">New</span> 
-          : ''}
-         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
-          
-          </div>
-          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
-          <Button
-            className={
-              topic === "Film & TV"
-                ? "p-2 activeButton"
-                : "p-2"
-            }
-            id="Film & TV"
-            onClick={(e) => {
-              setTopic(e.target.id);
-              if ( newMessage === e.target.id) {
-                setNewMessage("")
-             
-              }
-
-            }}
-          >
-            Film & TV
-          </Button>
-          { newMessage === "Film & TV" && topic != "Film & TV" ? <span className="m-1 p-2 newMessageButton">New</span> 
-          : ''}
-          </div>
-          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
-          <Button
-            className={
-              topic === "Music"
-                ? "p-2 activeButton"
-                : "p-2"
-            }
-            id="Music"
-            onClick={(e) => {
-              setTopic(e.target.id);
-              if ( newMessage === e.target.id) {
-                setNewMessage("")
-                
-              }
-            }}
-          >
-            Music
-          </Button>
-          { newMessage === "Music" && topic != "Music" ? <span className="m-1 p-2 newMessageButton">New</span> 
-          : ''}
-         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
-          </div>
-          <div className="d-flex flex-row justify-content-center align-items-center mx-auto mb-4">
-          <Button
-            className={
-              topic === "Sports"
-                ? "p-2 activeButton"
-                : "p-2"
-            }
-            id="Sports"
-            onClick={(e) => {
-              setTopic(e.target.id);
-              if ( newMessage === e.target.id) {
-                setNewMessage("")
-              
-              }
-            }}
-          >
-            Sports
-          </Button>
-          { newMessage === "Sports" && topic != "Sports" ? <span className="m-1 p-2 newMessageButton">New</span> 
-          : ''}
-         {/* <span className=" m-1 p-2 newMessageButton">New</span>  */}
-          </div>
 
           <Button
             className="p-2 d-flex justify-content-center align-items-center mx-auto mb-4 logoutBtn"
