@@ -14,6 +14,8 @@ const TopicButton = ({
     </div>
   );
 
+
+
   return (
     <>
       <div className={newMessage ? "row justify-content-end" : "row justify-content-center align-items-center mx-auto"}>
@@ -30,21 +32,21 @@ const TopicButton = ({
               console.log(newMessage)
 
               setCurrentTopic(e.target.id);
-              // if (currentTopic === topicName) {
-
-              //   setNewMessage(false)
-              //   console.log("newMessage cleared")
-              //   // console.log("NewMessage Set!")
-              // }
               
-
-              console.log(newMessage);
+              setNewMessage( newMessage => {
+                const newState = { ...newMessage, [e.target.id]: false}
+                console.log(newState)
+                return newState
+        })          
+              
             }}
           >
             {topicName}
           </Button>
         </div>
+        
         {newMessage ? newMessageIcon : null}
+     
       </div>
     </>
   );

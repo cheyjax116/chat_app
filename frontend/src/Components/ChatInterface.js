@@ -29,8 +29,6 @@ const ChatInterface = () => {
 
   const [message, setMessage] = useState("");
 
-  // const [newMessage, setNewMessage] = useState("")
-
   const [clearMessage, setClearMessage] = useState(false)
 
 const [newMessage, setNewMessage] = useState( {
@@ -186,9 +184,15 @@ const [newMessage, setNewMessage] = useState( {
 
   const socket = io.connect();
 
+let newMessageTopic = ''
+
   useEffect(() => {
-    if (newMessage === currentTopic ) {
+    if (newMessageTopic === currentTopic ) {
       console.log(newMessage)
+      setNewMessage( previousState => {
+        const newState = { ...previousState, currentTopic: false}
+        return newState
+      })
       // setNewMessage("")
       // setClearMessage(true)
       
@@ -229,16 +233,30 @@ const [newMessage, setNewMessage] = useState( {
 
           console.log("topic doesn't match...")
           console.log(currentTopic)
+         
 
         }
-        setNewMessage( {
+        if (message[0].topic === currentTopic) {
+          setNewMessage( previousState => {
+            const newState = { ...previousState, [message[0].topic]: false}
+            return newState
+          })
 
-          ...newMessage,
-          [message[0].topic]: true
-        })
+        } else {
+
+
+          setNewMessage( previousState => {
+            const newState = { ...previousState, [message[0].topic]: true}
+            return newState
+          })
+        }
+
+        newMessageTopic = [message[0].topic]
+        
+      
           
         
-       console.log(message[0])
+      //  console.log(message[0])
        
         
       });
