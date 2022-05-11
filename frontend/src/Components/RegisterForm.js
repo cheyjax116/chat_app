@@ -9,6 +9,7 @@ import pwdIcon from "../img/passwordIcon.png";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import io from "socket.io-client";
 
 const RegisterForm = () => {
   const [username, setUsername] = useState("");
@@ -22,6 +23,9 @@ const RegisterForm = () => {
   const togglePasswordVisibility = () => {
     setPasswordShown(!passwordShown);
   };
+
+
+  const socket = io.connect();
 
   const pushToken = (data) => {
     axios
@@ -44,23 +48,23 @@ const RegisterForm = () => {
       });
   };
 
-  const activateUser = (data) => {
-    axios
-        .post("api/activateuser", data, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        })
-        .then((res) => {
-          console.log(res);
-          return res;
-        })
-        .catch((error) => {
-          console.log("There was an error!", error);
-        });
+  // const activateUser = (data) => {
+  //   axios
+  //       .post("api/activateuser", data, {
+  //         headers: {
+  //           Accept: "application/json",
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //       .then((res) => {
+  //         console.log(res);
+  //         return res;
+  //       })
+  //       .catch((error) => {
+  //         console.log("There was an error!", error);
+  //       });
 
-  }
+  // }
 
   const handleClick = () => {
     const data = {
@@ -82,7 +86,7 @@ const RegisterForm = () => {
         .then((res) => {
           pushToken(data);
           localStorage.setItem("user", username);
-          activateUser(data)
+          socket.emit("activateUser", {username: username})
         })
         .catch((error) => {
           console.log("There was an error!", error);

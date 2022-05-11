@@ -29,7 +29,8 @@ const ChatInterface = () => {
 
   const [message, setMessage] = useState("");
 
-  const [clearMessage, setClearMessage] = useState(false)
+  // const [clearMessage, setClearMessage] = useState(false)
+  const [newMessageTopic, setNewMessageTopic] =  useState("")
 
 const [newMessage, setNewMessage] = useState( {
           General: false,
@@ -103,11 +104,16 @@ const [newMessage, setNewMessage] = useState( {
 
   let userId = selectSignedInUser(signedInUser);
 
-  function dateSuffix(day) {
-    if (day % 10 === 1) return `${day}st`;
-    if (day % 10 === 2) return `${day}nd`;
-    if (day % 10 === 3) return `${day}rd`;
-    return `${day}th`;
+  function dateSuffix(date) {
+    if (date > 3 && date < 21) return `${date}th`;
+    switch (date % 10) {
+      case 1: return `${date}st`;
+      case 2: return `${date}nd`;
+      case 3: return `${date}rd`;
+      default: return `${date}th`;
+
+    }
+   
   }
 
   const convertDate = (date) => {
@@ -184,41 +190,25 @@ const [newMessage, setNewMessage] = useState( {
 
   const socket = io.connect();
 
-let newMessageTopic = ''
 
   useEffect(() => {
     if (newMessageTopic === currentTopic ) {
-      console.log(newMessage)
-      setNewMessage( previousState => {
-        const newState = { ...previousState, currentTopic: false}
-        return newState
-      })
-      // setNewMessage("")
-      // setClearMessage(true)
-      
-    } 
-    // checkClearedMessage()
-    
-    console.log(newMessage)
-    // console.log(clearMessage)
 
-  }, [newMessage])
+        setNewMessage( previousState => {
+          const newState = { ...previousState, [newMessageTopic]: false}
+          console.log(newState)
+          return newState
+        })
+        console.log("Topic Same in this window...")
+        
+      } 
+      setNewMessageTopic("")
+    // console.log(currentTopic)
+    // console.log(newMessageTopic)
 
-  // useEffect(() => {
-  //   checkClearedMessage()
-  //   console.log(clearMessage)
-    
-  // }, [clearMessage])
+  }, [newMessageTopic])
 
-  // const checkClearedMessage = () => {
-  //   if (clearMessage === true + newMessage) {
-  //     setNewMessage("")
-  //     console.log(clearMessage)
-  //     setClearMessage(false)
-  //     console.log(newMessage)
-  //   }
-  //   console.log(clearMessage)
-  // }
+
 
   useEffect(() => {
 
@@ -227,36 +217,36 @@ let newMessageTopic = ''
       // console.log("Connected...")
     });
     newSocket.on("new_message", (message) => {
-   
-        setMessages((messages) => [...messages, message[0]]);
-        if (message[0].topic != currentTopic) {
-
-          console.log("topic doesn't match...")
-          console.log(currentTopic)
-         
-
-        }
-        if (message[0].topic === currentTopic) {
-          setNewMessage( previousState => {
-            const newState = { ...previousState, [message[0].topic]: false}
-            return newState
-          })
-
-        } else {
-
-
-          setNewMessage( previousState => {
-            const newState = { ...previousState, [message[0].topic]: true}
-            return newState
-          })
-        }
-
-        newMessageTopic = [message[0].topic]
-        
       
-          
+      
+      
+      setMessages((messages) => [...messages, message[0]]);
+
+      setNewMessageTopic(message[0].topic)
+
+      // if (message[0].topic != currentTopic) {
         
-      //  console.log(message[0])
+      //   console.log("topic doesn't match...")
+      //   console.log(currentTopic)
+        
+        
+      // }
+      if (message[0].topic === currentTopic) {
+        setNewMessage( previousState => {
+          const newState = { ...previousState, [message[0].topic]: false}
+          return newState
+        })
+        
+      } else {
+        
+        
+        setNewMessage( previousState => {
+          const newState = { ...previousState, [message[0].topic]: true}
+          return newState
+        })
+      }
+      
+    
        
         
       });
@@ -271,11 +261,7 @@ let newMessageTopic = ''
     });
   }, []);
 
-  // const clearNewMessage = () => {
-  //   setNewMessage("")
-  //   console.log(newMessage)
-    
-  // }
+
 
   const formatTime = (utcTime) => {
     const time = DateTime.fromISO(utcTime).toFormat("t");
