@@ -24,7 +24,6 @@ const RegisterForm = () => {
     setPasswordShown(!passwordShown);
   };
 
-
   const socket = io.connect();
 
   const pushToken = (data) => {
@@ -48,24 +47,6 @@ const RegisterForm = () => {
       });
   };
 
-  // const activateUser = (data) => {
-  //   axios
-  //       .post("api/activateuser", data, {
-  //         headers: {
-  //           Accept: "application/json",
-  //           "Content-Type": "application/json",
-  //         },
-  //       })
-  //       .then((res) => {
-  //         console.log(res);
-  //         return res;
-  //       })
-  //       .catch((error) => {
-  //         console.log("There was an error!", error);
-  //       });
-
-  // }
-
   const handleClick = () => {
     const data = {
       username: username,
@@ -86,14 +67,12 @@ const RegisterForm = () => {
         .then((res) => {
           pushToken(data);
           localStorage.setItem("user", username);
-          socket.emit("activateUser", {username: username})
+          socket.emit("activateUser", { username: username });
         })
         .catch((error) => {
           console.log("There was an error!", error);
           setWrongDetails(true);
         });
-
-      
     } else {
       setFullPassword(false);
     }
@@ -131,7 +110,7 @@ const RegisterForm = () => {
             name="userName"
             id="userName"
             placeholder="Username"
-            minlength="4"
+            minlength="6"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
           ></input>
@@ -146,7 +125,7 @@ const RegisterForm = () => {
             name="password"
             id="password"
             placeholder="Password"
-            minlength="4"
+            minlength="6"
             maxLength="15"
             onChange={(e) => setPassword(e.target.value)}
             onKeyUp={(e) => {

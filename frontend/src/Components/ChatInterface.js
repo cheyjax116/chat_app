@@ -7,7 +7,7 @@ import useToken from "./useToken";
 import useUser from "./useUser";
 import io from "socket.io-client";
 import { DateTime } from "luxon";
-import TopicButton  from "./TopicButton"
+import TopicButton from "./TopicButton";
 
 const ChatInterface = () => {
   window.setTimeout(function () {
@@ -29,18 +29,15 @@ const ChatInterface = () => {
 
   const [message, setMessage] = useState("");
 
-  // const [clearMessage, setClearMessage] = useState(false)
-  const [newMessageTopic, setNewMessageTopic] =  useState("")
+  const [newMessageTopic, setNewMessageTopic] = useState("");
 
-const [newMessage, setNewMessage] = useState( {
-          General: false,
-          Art: false,
-          "Film & TV": false,
-          Music: false,
-          Sports: false,
-})
-       
-
+  const [newMessage, setNewMessage] = useState({
+    General: false,
+    Art: false,
+    "Film & TV": false,
+    Music: false,
+    Sports: false,
+  });
 
   let navigate = useNavigate();
 
@@ -107,13 +104,15 @@ const [newMessage, setNewMessage] = useState( {
   function dateSuffix(date) {
     if (date > 3 && date < 21) return `${date}th`;
     switch (date % 10) {
-      case 1: return `${date}st`;
-      case 2: return `${date}nd`;
-      case 3: return `${date}rd`;
-      default: return `${date}th`;
-
+      case 1:
+        return `${date}st`;
+      case 2:
+        return `${date}nd`;
+      case 3:
+        return `${date}rd`;
+      default:
+        return `${date}th`;
     }
-   
   }
 
   const convertDate = (date) => {
@@ -134,13 +133,10 @@ const [newMessage, setNewMessage] = useState( {
         text: message,
         topic: currentTopic,
       });
-      
     }
     setMessage("");
     messageBox.value = "";
-
   };
-  
 
   const logOut = () => {
     axios
@@ -160,97 +156,41 @@ const [newMessage, setNewMessage] = useState( {
       .catch((error) => {
         console.log("An error was caught!", error);
       });
-
-    // const user = {
-    //   username: signedInUser,
-    // };
-
-    // axios
-    //   .post("api/deactivateuser", user, {
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     return res;
-    //   })
-    //   .catch((error) => {
-    //     console.log("There was an error!", error);
-    //   });
   };
 
   useEffect(() => {
     getMessages();
     getUsers();
     getActiveUsers();
-    console.log(currentTopic)
   }, [currentTopic]);
 
   const socket = io.connect();
 
+  useEffect(() => {
+    if (newMessageTopic === currentTopic) {
+      setNewMessage((previousState) => {
+        const newState = { ...previousState, [newMessageTopic]: false };
+        return newState;
+      });
+    }
+    setNewMessageTopic("");
+  }, [newMessageTopic]);
 
   useEffect(() => {
-    if (newMessageTopic === currentTopic ) {
-
-        setNewMessage( previousState => {
-          const newState = { ...previousState, [newMessageTopic]: false}
-          console.log(newState)
-          return newState
-        })
-        console.log("Topic Same in this window...")
-        
-      } 
-      setNewMessageTopic("")
-    // console.log(currentTopic)
-    // console.log(newMessageTopic)
-
-  }, [newMessageTopic])
-
-
-
-  useEffect(() => {
-
-    let newSocket = io.connect()
+    let newSocket = io.connect();
     socket.on("connect", () => {
       // console.log("Connected...")
     });
     newSocket.on("new_message", (message) => {
-      
-      
-      
       setMessages((messages) => [...messages, message[0]]);
 
-      setNewMessageTopic(message[0].topic)
+      setNewMessageTopic(message[0].topic);
 
-      // if (message[0].topic != currentTopic) {
-        
-      //   console.log("topic doesn't match...")
-      //   console.log(currentTopic)
-        
-        
-      // }
-      if (message[0].topic === currentTopic) {
-        setNewMessage( previousState => {
-          const newState = { ...previousState, [message[0].topic]: false}
-          return newState
-        })
-        
-      } else {
-        
-        
-        setNewMessage( previousState => {
-          const newState = { ...previousState, [message[0].topic]: true}
-          return newState
-        })
-      }
-      
-    
-       
-        
+      setNewMessage((previousState) => {
+        const newState = { ...previousState, [message[0].topic]: true };
+        return newState;
       });
-      
+    });
 
     socket.on("activateUser", () => {
       getActiveUsers();
@@ -261,8 +201,6 @@ const [newMessage, setNewMessage] = useState( {
     });
   }, []);
 
-
-
   const formatTime = (utcTime) => {
     const time = DateTime.fromISO(utcTime).toFormat("t");
     return time;
@@ -270,12 +208,9 @@ const [newMessage, setNewMessage] = useState( {
 
   const filteredData = data.filter((message) => {
     if (message.topic === currentTopic) {
-      return message
-
+      return message;
     }
-  })
-
-
+  });
 
   const theMessages =
     filteredData &&
@@ -337,13 +272,41 @@ const [newMessage, setNewMessage] = useState( {
 
           <h6 className="text-center p-3">Topics</h6>
 
-          <TopicButton topicName={"General"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.General} setNewMessage={setNewMessage} />
-          <TopicButton topicName={"Art"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Art} setNewMessage={setNewMessage} />
-          <TopicButton topicName={"Film & TV"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage["Film & TV"]} setNewMessage={setNewMessage} />
-          <TopicButton topicName={"Music"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Music} setNewMessage={setNewMessage} />
-          <TopicButton topicName={"Sports"} currentTopic={currentTopic} setCurrentTopic={setCurrentTopic} newMessage={newMessage.Sports} setNewMessage={setNewMessage} />
-
-          
+          <TopicButton
+            topicName={"General"}
+            currentTopic={currentTopic}
+            setCurrentTopic={setCurrentTopic}
+            newMessage={newMessage.General}
+            setNewMessage={setNewMessage}
+          />
+          <TopicButton
+            topicName={"Art"}
+            currentTopic={currentTopic}
+            setCurrentTopic={setCurrentTopic}
+            newMessage={newMessage.Art}
+            setNewMessage={setNewMessage}
+          />
+          <TopicButton
+            topicName={"Film & TV"}
+            currentTopic={currentTopic}
+            setCurrentTopic={setCurrentTopic}
+            newMessage={newMessage["Film & TV"]}
+            setNewMessage={setNewMessage}
+          />
+          <TopicButton
+            topicName={"Music"}
+            currentTopic={currentTopic}
+            setCurrentTopic={setCurrentTopic}
+            newMessage={newMessage.Music}
+            setNewMessage={setNewMessage}
+          />
+          <TopicButton
+            topicName={"Sports"}
+            currentTopic={currentTopic}
+            setCurrentTopic={setCurrentTopic}
+            newMessage={newMessage.Sports}
+            setNewMessage={setNewMessage}
+          />
 
           <Button
             className="p-2 d-flex justify-content-center align-items-center mx-auto mb-4 logoutBtn"
@@ -356,7 +319,6 @@ const [newMessage, setNewMessage] = useState( {
         <div className="parent">
           <div className="discussionBox" id="chatBox">
             {theMessages}
-        
           </div>
 
           <div className="flex child">
@@ -376,7 +338,6 @@ const [newMessage, setNewMessage] = useState( {
                   onKeyUp={(e) => {
                     if (e.key === "Enter") {
                       databaseSend();
-                    
                     }
                   }}
                 />

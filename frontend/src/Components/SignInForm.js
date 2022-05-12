@@ -25,7 +25,6 @@ const SignInForm = () => {
 
   const socket = io.connect();
 
-
   const handleClick = () => {
     const data = {
       username: username,
@@ -46,7 +45,7 @@ const SignInForm = () => {
       .then((res) => {
         localStorage.setItem("token", res.data.access_token);
         localStorage.setItem("user", username);
-        socket.emit("activateUser", {username: username})
+        socket.emit("activateUser", { username: username });
         navigate("/chat");
         window.location.reload();
       })

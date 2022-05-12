@@ -20,43 +20,9 @@ api = Api(api_blueprint)
 from server import socketio_socket
 
 
-# @api.route("/messages")
-# class Message(Resource):
-#     def get(self):
-
-#         return jsonify(getMessages())
-
-#     def post(self):
-#         req_data = request.get_json()
-#         userId = req_data["userId"]
-#         text = req_data["text"]
-#         topic = req_data["topic"]
-
-#         message = createMessage(userId, text, topic)
-
-#         def datetime_handler(x):
-#             if isinstance(x, (date, datetime)):
-#                 return x.isoformat()
-#             raise TypeError("Unknown type")
-
-#         getNewMessage = getLatestMessage()
-        
-#         socketio_socket.emit(
-#             "new_message", json.loads(json.dumps(getNewMessage, default=datetime_handler))
-#     )
-#         # broadcast message
-#         # emit("new_message", message)
-#         return jsonify(message)
-
-
-
-
-
-
-
-@socketio_socket.on("connect")
-def test_connect():
-    print("connected")
+# @socketio_socket.on("connect")
+# def test_connect():
+#     print("connected")
 
 
 @socketio_socket.on("new_message")
@@ -76,13 +42,11 @@ def post(msg):
             return x.isoformat()
         raise TypeError("Unknown type")
 
-    
     socketio_socket.emit(
         "new_message", json.loads(json.dumps(getNewMessage, default=datetime_handler))
     )
 
     return jsonify(message)
-    # return jsonify(getNewMessage)
 
 
 @socketio_socket.on("get_messages_by_topic")
