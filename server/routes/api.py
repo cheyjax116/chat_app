@@ -153,6 +153,6 @@ def deactivate(user):
     username = user["username"]
     deactivatedUser = deactiveUser(username)
     socketio_socket.emit("deactivateUser", username)
-    print("user is deactivated")
+    # print("user is deactivated")
 
     return jsonify(deactivatedUser)
