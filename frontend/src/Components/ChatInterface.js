@@ -124,6 +124,8 @@ const ChatInterface = () => {
     return `${weekday}, ${month} ${day}, ${year}`;
   };
 
+
+
   const databaseSend = () => {
     let messageBox = document.getElementById("messageBox");
 
@@ -217,16 +219,16 @@ const ChatInterface = () => {
     filteredData.map((message, index) => {
       let prev = data[index - 1];
       let current = data[index];
-
+     
       return (
         <div>
-          {prev?.createddate === current?.createddate ? (
+          {convertDate(prev?.time_created) === convertDate(current?.time_created) ? (
             ""
           ) : (
             <div>
               <div className="fw-bold mx-auto horizontalLine"></div>
               <div className="fw-bold mt-4" style={{ color: "#444c55" }}>
-                {convertDate(message?.createddate)}
+                {convertDate(message?.time_created)}
               </div>
             </div>
           )}
