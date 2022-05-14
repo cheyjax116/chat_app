@@ -124,8 +124,6 @@ const ChatInterface = () => {
     return `${weekday}, ${month} ${day}, ${year}`;
   };
 
-
-
   const databaseSend = () => {
     let messageBox = document.getElementById("messageBox");
 
@@ -219,10 +217,11 @@ const ChatInterface = () => {
     filteredData.map((message, index) => {
       let prev = data[index - 1];
       let current = data[index];
-     
+
       return (
         <div>
-          {convertDate(prev?.time_created) === convertDate(current?.time_created) ? (
+          {convertDate(prev?.time_created) ===
+          convertDate(current?.time_created) ? (
             ""
           ) : (
             <div>
@@ -310,12 +309,14 @@ const ChatInterface = () => {
             setNewMessage={setNewMessage}
           />
 
-          <Button
-            className="p-2 d-flex justify-content-center align-items-center mx-auto mb-4 logoutBtn"
-            onClick={logOut}
-          >
-            Logout
-          </Button>
+          <div className="d-flex justify-content-center">
+            <Button
+              className="p-2 align-items-bottom mx-auto mb-4 logoutBtn"
+              onClick={logOut}
+            >
+              Logout
+            </Button>
+          </div>
         </div>
 
         <div className="parent">

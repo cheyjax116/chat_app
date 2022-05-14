@@ -117,9 +117,10 @@ p {
   padding: 20px;
 }
 
-@media only screen and (min-height: 1500px) {
+@media only screen and (min-height: 588px) and (max-height: 12000px) {
   .logoutBtn {
-    margin-top: 66rem !important;
+    position: absolute;
+    bottom: 0;
   }
 }
 
